@@ -7,7 +7,9 @@
       "general": "Général",
       "config": "Config",
       "interface": "Interface",
-      "hooks": "Hooks"
+      "hooks": "Hooks",
+      "onboarding": "Arrivée",
+      "users": "Utilisateurs"
     }
   },
   "user": {
@@ -185,7 +187,39 @@
       "firewallEnabled": "Activer le pare-feu par client",
       "firewallEnabledDesc": "Restreindre le trafic des clients à des IPs de destination spécifiques via iptables. Lorsqu'il est activé, chaque client peut être configuré avec des destinations autorisées."
     },
-    "introText": "Bienvenue dans le panel d'administration.\n\nVous pouvez y gérer les paramètres généraux, la configuration, les paramètres de l'interface et les hooks.\n\nCommencez par choisir l'une des sections de la barre latérale."
+    "introText": "Bienvenue dans le panel d'administration.\n\nVous pouvez y gérer les paramètres généraux, la configuration, les paramètres de l'interface et les hooks.\n\nCommencez par choisir l'une des sections de la barre latérale.",
+    "users": {
+      "introText": "Les comptes qui peuvent se connecter et posséder des appareils.",
+      "create": "Ajouter un utilisateur",
+      "name": "Nom complet",
+      "username": "Identifiant",
+      "password": "Mot de passe",
+      "email": "Courriel",
+      "roleAdmin": "Administrateur",
+      "roleClient": "Utilisateur",
+      "roleAdminDesc": "Les administrateurs gèrent tous les utilisateurs, appareils et dossiers.",
+      "deviceCount": "{enabled}/{total} appareils actifs",
+      "offboard": "Désactiver cette personne et tous ses appareils",
+      "onboardBack": "Réactiver cette personne et tous ses appareils",
+      "delete": "Supprimer l'utilisateur",
+      "deleteDialog": "Supprimer {name} et ses {count} appareil(s) ? Ses configurations VPN cessent de fonctionner immédiatement.",
+      "created": "Utilisateur créé",
+      "deleted": "Utilisateur supprimé",
+      "you": "vous"
+    },
+    "onboarding": {
+      "introText": "Créez une personne et tous ses appareils d'un coup. Chaque appareil reçoit sa propre configuration VPN.",
+      "person": "Personne",
+      "devices": "Appareils",
+      "deviceList": "Un appareil par ligne",
+      "submit": "Créer le compte et les appareils",
+      "done": "Compte et appareils créés",
+      "doneText": "{name} a maintenant {count} appareil(s). Ouvrez chacun pour envoyer sa configuration ou son QR code.",
+      "viewDevices": "Voir les appareils",
+      "another": "Inscrire quelqu'un d'autre",
+      "laptop": "Portable",
+      "phone": "Téléphone"
+    }
   },
   "zod": {
     "generic": {
@@ -220,7 +254,9 @@
       "passwordMatch": "Les mots de passe doivent correspondre",
       "totpEnable": "Activer TOTP",
       "totpEnableTrue": "Activer TOTP doit être activé",
-      "totpCode": "Code TOTP"
+      "totpCode": "Code TOTP",
+      "role": "Rôle",
+      "id": "ID de l'utilisateur"
     },
     "userConfig": {
       "host": "Hôte"
@@ -249,6 +285,10 @@
     "file": "Fichier",
     "folder": {
       "intoDescendant": "Un dossier ne peut pas être déplacé dans un de ses propres sous-dossiers"
+    },
+    "onboarding": {
+      "deviceName": "Nom de l'appareil",
+      "devices": "Appareils"
     }
   },
   "hooks": {

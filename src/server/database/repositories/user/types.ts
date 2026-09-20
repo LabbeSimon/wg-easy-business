@@ -3,7 +3,8 @@ import z from 'zod';
 
 import type { user } from './schema';
 
-import { safeStringRefine, t } from '#server/utils/types';
+import { EnabledSchema, safeStringRefine, t } from '#server/utils/types';
+import { type Role, roles } from '#shared/utils/permissions';
 
 export type UserType = InferSelectModel<typeof user>;
 
@@ -57,6 +58,38 @@ const email = z
 export const UserUpdateSchema = z.object({
   name: name,
   email: email,
+});
+
+const role = z
+  .number({ message: t('zod.user.role') })
+  .refine((v): v is Role => v === roles.ADMIN || v === roles.CLIENT, {
+    message: t('zod.user.role'),
+  });
+
+export const UserCreateSchema = z.object({
+  username: username,
+  password: password,
+  name: name,
+  email: email,
+  role: role,
+});
+
+export type UserCreateType = z.infer<typeof UserCreateSchema>;
+
+export const UserAdminUpdateSchema = z.object({
+  name: name,
+  email: email,
+  role: role,
+});
+
+export type UserAdminUpdateType = z.infer<typeof UserAdminUpdateSchema>;
+
+export const UserGetSchema = z.object({
+  userId: z.coerce.number({ message: t('zod.user.id') }),
+});
+
+export const UserToggleSchema = z.object({
+  enabled: EnabledSchema,
 });
 
 export const UserUpdatePasswordSchema = z

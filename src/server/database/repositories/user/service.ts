@@ -1,15 +1,19 @@
-import { eq, sql, and } from 'drizzle-orm';
+import { eq, ne, sql, and } from 'drizzle-orm';
 import { TOTP } from 'otpauth';
 
+import { client } from '../client/schema';
+
 import { user } from './schema';
-import type { UserType } from './types';
+import type { UserAdminUpdateType, UserCreateType, UserType } from './types';
 
 import { WG_ENV } from '#server/utils/config';
 import type { OAUTH_PROVIDER } from '#server/utils/oauth';
 import { hashPassword, isPasswordValid } from '#server/utils/password';
 import type { ID } from '#server/utils/types';
-import { roles } from '#shared/utils/permissions';
+import { type Role, roles } from '#shared/utils/permissions';
 import type { DBType } from '#db/sqlite';
+
+type TxType = Parameters<Parameters<DBType['transaction']>[0]>[0];
 
 type LoginResult =
   | {
@@ -103,6 +107,33 @@ export class UserService {
     return this.#statements.findAll.execute();
   }
 
+  /**
+   * Safe to hand to the admin panel: password hashes and totp secrets stay out.
+   */
+  async getAllPublic() {
+    const users = await this.#statements.findAll.execute();
+    const devices = await this.#db
+      .select({ userId: client.userId, enabled: client.enabled })
+      .from(client)
+      .execute();
+
+    return users.map((row) => ({
+      id: row.id,
+      username: row.username,
+      name: row.name,
+      email: row.email,
+      role: row.role,
+      enabled: row.enabled,
+      totpVerified: row.totpVerified,
+      oauthProvider: row.oauthProvider,
+      createdAt: row.createdAt,
+      deviceCount: devices.filter((device) => device.userId === row.id).length,
+      enabledDeviceCount: devices.filter(
+        (device) => device.userId === row.id && device.enabled
+      ).length,
+    }));
+  }
+
   async get(id: ID) {
     return this.#statements.findById.execute({ id });
   }
@@ -139,8 +170,115 @@ export class UserService {
     });
   }
 
+  /**
+   * Used by an admin to enroll somebody, unlike {@link create} which covers
+   * the very first account of a fresh install.
+   */
+  async createByAdmin({
+    username,
+    password,
+    name,
+    email,
+    role,
+  }: UserCreateType) {
+    const hash = await hashPassword(password);
+
+    return this.#db.transaction(async (tx) => {
+      const oldUser = await tx.query.user
+        .findFirst({ where: eq(user.username, username) })
+        .execute();
+
+      if (oldUser) {
+        throw new Error('User already exists');
+      }
+
+      const created = await tx
+        .insert(user)
+        .values({
+          username,
+          password: hash,
+          name,
+          email,
+          role,
+          totpVerified: false,
+          enabled: true,
+        })
+        .returning({ userId: user.id })
+        .execute();
+
+      return created[0]!.userId;
+    });
+  }
+
   async update(id: ID, name: string, email: string | null) {
     return this.#statements.update.execute({ id, name, email });
+  }
+
+  async updateByAdmin(id: ID, { name, email, role }: UserAdminUpdateType) {
+    return this.#db.transaction(async (tx) => {
+      await this.#assertNotLastAdmin(tx, id, { role });
+
+      await tx
+        .update(user)
+        .set({ name, email, role })
+        .where(eq(user.id, id))
+        .execute();
+    });
+  }
+
+  async setEnabled(id: ID, enabled: boolean) {
+    return this.#db.transaction(async (tx) => {
+      if (!enabled) {
+        await this.#assertNotLastAdmin(tx, id, { enabled });
+      }
+
+      await tx.update(user).set({ enabled }).where(eq(user.id, id)).execute();
+    });
+  }
+
+  /**
+   * Devices go with their owner, the foreign key would refuse the delete otherwise.
+   */
+  async delete(id: ID) {
+    return this.#db.transaction(async (tx) => {
+      await this.#assertNotLastAdmin(tx, id, { enabled: false });
+
+      await tx.delete(client).where(eq(client.userId, id)).execute();
+      await tx.delete(user).where(eq(user.id, id)).execute();
+    });
+  }
+
+  /**
+   * Locking everybody out of the admin panel is not recoverable from the web UI.
+   */
+  async #assertNotLastAdmin(
+    tx: TxType,
+    id: ID,
+    change: { role?: Role; enabled?: boolean }
+  ) {
+    const target = await tx.query.user
+      .findFirst({ where: eq(user.id, id) })
+      .execute();
+
+    if (!target || target.role !== roles.ADMIN || !target.enabled) {
+      return;
+    }
+
+    const staysAdmin = (change.role ?? target.role) === roles.ADMIN;
+    const staysEnabled = change.enabled ?? target.enabled;
+
+    if (staysAdmin && staysEnabled) {
+      return;
+    }
+
+    const otherAdmins = await tx.$count(
+      user,
+      and(eq(user.role, roles.ADMIN), eq(user.enabled, true), ne(user.id, id))
+    );
+
+    if (otherAdmins === 0) {
+      throw new Error('Cannot remove the last enabled administrator');
+    }
   }
 
   async updatePassword(

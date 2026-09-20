@@ -55,6 +55,8 @@ const { t } = useI18n();
 const route = useRoute();
 
 const menuItems = computed(() => [
+  { id: 'onboarding', name: t('pages.admin.onboarding') },
+  { id: 'users', name: t('pages.admin.users') },
   { id: 'general', name: t('pages.admin.general') },
   { id: 'config', name: t('pages.admin.config') },
   { id: 'interface', name: t('pages.admin.interface') },

@@ -1,4 +1,4 @@
-import { inArray, isNotNull } from 'drizzle-orm';
+import { eq, inArray, isNotNull } from 'drizzle-orm';
 
 import { client } from '../client/schema';
 import { FOLDER_PATH_MAX_LENGTH } from '../client/types';
@@ -40,6 +40,40 @@ export class FolderService {
         expiresAt: string | null;
       }[]
     >;
+  }
+
+  /**
+   * Offboarding acts on a person, whichever folders their devices ended up in.
+   */
+  async setEnabledForUser(userId: ID, enabled: boolean) {
+    const rows = await this.#db
+      .select({
+        id: client.id,
+        enabled: client.enabled,
+        expiresAt: client.expiresAt,
+      })
+      .from(client)
+      .where(eq(client.userId, userId))
+      .execute();
+
+    const ids = rows
+      .filter(
+        (row) =>
+          row.enabled !== enabled && !(enabled && isExpired(row.expiresAt))
+      )
+      .map((row) => row.id);
+
+    if (ids.length === 0) {
+      return 0;
+    }
+
+    await this.#db
+      .update(client)
+      .set({ enabled })
+      .where(inArray(client.id, ids))
+      .execute();
+
+    return ids.length;
   }
 
   /**

@@ -7,7 +7,9 @@
       "general": "General",
       "config": "Config",
       "interface": "Interface",
-      "hooks": "Hooks"
+      "hooks": "Hooks",
+      "onboarding": "Onboarding",
+      "users": "Users"
     }
   },
   "user": {
@@ -199,7 +201,39 @@
       "firewallEnabled": "Enable Per-Client Firewall",
       "firewallEnabledDesc": "Restrict client traffic to specific destination IPs using iptables. When enabled, each client can be configured with allowed destinations."
     },
-    "introText": "Welcome to the admin panel.\n\nHere you can manage the general settings, the configuration, the interface settings and the hooks.\n\nStart by choosing one of the sections in the sidebar."
+    "introText": "Welcome to the admin panel.\n\nHere you can manage the general settings, the configuration, the interface settings and the hooks.\n\nStart by choosing one of the sections in the sidebar.",
+    "users": {
+      "introText": "Accounts that can sign in and own devices.",
+      "create": "Add a user",
+      "name": "Full name",
+      "username": "Username",
+      "password": "Password",
+      "email": "Email",
+      "roleAdmin": "Administrator",
+      "roleClient": "User",
+      "roleAdminDesc": "Administrators manage every user, device and folder.",
+      "deviceCount": "{enabled}/{total} devices active",
+      "offboard": "Disable this person and all of their devices",
+      "onboardBack": "Re-enable this person and all of their devices",
+      "delete": "Delete user",
+      "deleteDialog": "Delete {name} and their {count} device(s)? Their VPN configurations stop working immediately.",
+      "created": "User created",
+      "deleted": "User deleted",
+      "you": "you"
+    },
+    "onboarding": {
+      "introText": "Create somebody and all of their devices in one go. Each device gets its own VPN configuration.",
+      "person": "Person",
+      "devices": "Devices",
+      "deviceList": "One device per line",
+      "submit": "Create the account and the devices",
+      "done": "Account and devices created",
+      "doneText": "{name} now has {count} device(s). Open each one to send its configuration or QR code.",
+      "viewDevices": "See the devices",
+      "another": "Enroll somebody else",
+      "laptop": "Laptop",
+      "phone": "Phone"
+    }
   },
   "zod": {
     "generic": {
@@ -236,7 +270,9 @@
       "passwordMatch": "Passwords must match",
       "totpEnable": "TOTP Enable",
       "totpEnableTrue": "TOTP Enable must be true",
-      "totpCode": "TOTP Code"
+      "totpCode": "TOTP Code",
+      "role": "Role",
+      "id": "User ID"
     },
     "userConfig": {
       "host": "Host"
@@ -268,6 +304,10 @@
     "file": "File",
     "folder": {
       "intoDescendant": "A folder cannot be moved into one of its own subfolders"
+    },
+    "onboarding": {
+      "deviceName": "Device name",
+      "devices": "Devices"
     }
   },
   "hooks": {
