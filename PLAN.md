@@ -58,42 +58,63 @@ stocker d'état de dossier.
 
 ---
 
-## Todo
+## Fait
 
 ### Phase 1 — Base de données
-- [ ] 1.1 Colonne `clients_table.folder` (texte, nullable, `null` = racine)
-- [ ] 1.2 Migration `0009_*.sql` + snapshot meta via `drizzle-kit generate`
-- [ ] 1.3 Vérifier que la migration passe sur une base existante non vide
+- [x] Colonne `clients_table.folder` (texte, nullable, `null` = racine)
+- [x] Migration `0009_sleepy_sprite.sql` + snapshot, vérifiée sur une base vierge et au démarrage
 
-### Phase 2 — Backend dossiers
-- [ ] 2.1 `FolderPathSchema` (zod) : segments non vides, pas de `/` en tête ni en queue, pas de `//`, longueur bornée, passe par `safeStringRefine` + `controlStringRefine`
-- [ ] 2.2 `FolderService` (ou méthodes sur `ClientService`) : `getTree` (chemins distincts → arbre + compteurs + état agrégé), `rename`, `move`, `setEnabled`
-- [ ] 2.3 Ressource `folders` dans `permissions.ts` : admin = tout, client = `view` sur ses propres appareils
-- [ ] 2.4 `GET /api/folder` — l'arbre avec, par nœud : nombre d'appareils, nombre d'allumés, profondeur
-- [ ] 2.5 `POST /api/folder/toggle` — `{ path, enabled }`, bulk `UPDATE` sur `folder = path OR folder LIKE path || '/%'`, puis `WireGuard.saveConfig()`
-- [ ] 2.6 `POST /api/folder/rename` — `{ from, to }`, `UPDATE` de préfixe, refus si `to` est un descendant de `from`
-- [ ] 2.7 `POST /api/client/[clientId]/folder` — ranger un appareil (`null` = racine)
-- [ ] 2.8 Exposer `folder` dans `getAllPublic` / `getAllForUser` + filtre `folder` sur `ClientQuerySchema`
+### Phase 2 — Dossiers
+- [x] `FolderPathSchema` : segments non vides, bornés, espaces autour des `/` normalisés
+- [x] `shared/utils/folders.ts` : `buildFolderTree`, `inBranch`, `FOLDER_DEPTH_WARNING`
+- [x] `FolderService` : `setEnabled` (branche entière), `rename` (réécriture de préfixe, refus vers un descendant)
+- [x] Ressource `folders` dans `permissions.ts`, action `manage`, admin uniquement
+- [x] `POST /api/folder/toggle`, `POST /api/folder/rename`, `POST /api/client/[clientId]/folder`
+- [x] `folder` exposé dans les listes, et pris en compte par la recherche
 
-### Phase 3 — Backend multi-appareils
-- [ ] 3.1 Supprimer le `userId: 1` en dur : `ClientCreateSchema` accepte un `userId` optionnel
-- [ ] 3.2 Admin → peut créer pour n'importe quel utilisateur ; non-admin → forcé sur son propre `user.id`
-- [ ] 3.3 Idem dans `createFromExisting` (import de conf)
-- [ ] 3.4 `GET /api/admin/users` — liste pour le sélecteur de propriétaire
-- [ ] 3.5 Filtre `userId` sur `ClientQuerySchema`
-- [ ] 3.6 Vérifier l'isolation : un non-admin ne doit ni voir ni modifier les appareils d'un autre
+### Phase 3 — Multi-appareils
+- [x] `userId: 1` en dur supprimé ; l'admin choisit le propriétaire, un non-admin est forcé sur lui-même
+- [x] `GET /api/admin/users` (sans hash de mot de passe ni secret TOTP)
+- [x] Propriétaire joint aux listes d'appareils
 
-### Phase 4 — Frontend
-- [ ] 4.1 Store `folders` (pinia) + fetch de l'arbre
-- [ ] 4.2 `Folders/Tree.vue` — arbre repliable, compteur d'appareils, avertissement au-delà de 5 niveaux
-- [ ] 4.3 Interrupteur de dossier à trois états (tout / rien / mixte) + confirmation au-delà de N appareils
-- [ ] 4.4 Dialogues : créer (= ranger un premier appareil), renommer, déplacer
-- [ ] 4.5 `Clients/List.vue` regroupé par dossier, racine = « Non classés »
-- [ ] 4.6 Sélecteur de dossier dans `ClientCard/Edit.vue` (saisie libre avec autocomplétion des chemins existants)
-- [ ] 4.7 Propriétaire affiché sur la carte + sélecteur d'utilisateur dans `Clients/CreateDialog.vue`
-- [ ] 4.8 Traductions `src/i18n/locales/` (en + fr au minimum)
+### Phase 4 — Interface
+- [x] `Folders/Node.vue` : arbre récursif, repliable, compteurs, avertissement au-delà de 5 niveaux
+- [x] Interrupteur de branche : allumé dès qu'un appareil l'est, un clic coupe toute la branche
+- [x] `Folders/RenameDialog.vue`
+- [x] `Clients/List.vue` regroupé par dossier, racine = « Non classés »
+- [x] Champ dossier dans la fiche d'appareil et à la création
+- [x] Propriétaire affiché sur la carte dès qu'il y a plus d'un utilisateur
+- [x] Traductions anglais + français
 
 ### Phase 5 — Vérification
-- [ ] 5.1 Tests unitaires (`src/test/unit/`) : construction de l'arbre, renommage de préfixe, refus du déplacement dans un descendant, bulk toggle
-- [ ] 5.2 Essai réel via `docker-compose.dev.yml` : couper un dossier → les peers disparaissent de `wg show`
-- [ ] 5.3 `pnpm lint` + typecheck
+- [x] 7 tests unitaires sur l'arbre et `inBranch` (67 tests au total au vert)
+- [x] `typecheck`, `lint`, `build` au vert
+- [x] Essai réel sur une instance dev isolée : couper `Client A/Paris` a fait tomber 3 appareils
+      sur 5 et les peers de `wg show` sont passés de 5 à 2 ; réactivation et déplacement corrects
+- [x] Frontière de sécurité vérifiée : un non-admin reçoit 403 sur toutes les opérations de dossier
+- [x] Multi-appareils vérifié : 3 appareils attribués à un second utilisateur, qui ne voit que les siens
+
+---
+
+## Écarts par rapport au plan initial
+
+- **Pas de `GET /api/folder`.** La liste des appareils porte déjà le chemin de chaque appareil,
+  donc l'arbre est construit côté client. Un aller-retour réseau en moins, et l'arbre reste
+  synchronisé avec le rafraîchissement automatique de la page.
+- **Le calcul de l'arbre vit dans `shared/utils/folders.ts`**, partagé entre l'interface et les tests,
+  plutôt que dans le service serveur.
+- **Les chemins sont normalisés au lieu d'être refusés.** Taper `Client A / Paris` enregistre
+  `Client A/Paris`, plutôt que de renvoyer une erreur.
+- **`docker-compose.dev.yml` écoute sur 51830/51831 en 127.0.0.1.** Permet de développer sur une
+  machine où une instance wg-easy de production tourne déjà, ce qui est le cas de msi.
+
+---
+
+## Reste ouvert
+
+- Il n'existe aucune interface de création d'utilisateur dans wg-easy : le sélecteur de propriétaire
+  ne propose que les comptes déjà présents en base. À décider si ce fork doit en ajouter une.
+- Déplacer un appareil d'un dossier à l'autre se fait par le champ texte de sa fiche. Un
+  glisser-déposer dans l'arbre serait plus direct.
+- Le DNS des conteneurs Docker est cassé sur msi (règle ufw, connue depuis le 21/08) : le build
+  de l'image dev a dû passer par `--network=host`.
