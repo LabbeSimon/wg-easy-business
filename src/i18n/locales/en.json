@@ -223,7 +223,8 @@
       "serverAllowedIps": "Server Allowed IPs",
       "firewallIps": "Firewall Allowed IPs",
       "firewallIpsInvalid": "Invalid firewall IP entry. See docs for supported syntax.",
-      "folder": "Folder"
+      "folder": "Folder",
+      "folderInvalid": "Folder path must not contain empty levels, and each level is 64 characters at most."
     },
     "user": {
       "username": "Username",

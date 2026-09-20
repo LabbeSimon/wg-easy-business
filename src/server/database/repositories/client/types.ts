@@ -54,17 +54,22 @@ export const FolderPathSchema = z
   .max(FOLDER_PATH_MAX_LENGTH, { message: t('zod.client.folder') })
   .pipe(safeStringRefine)
   .pipe(controlStringRefine)
+  // "Client A / Paris" is what people actually type, keep the path canonical
+  .transform((v) =>
+    v
+      .split('/')
+      .map((segment) => segment.trim())
+      .join('/')
+  )
   .refine(
     (v) =>
-      v.split('/').every((segment) => {
-        const trimmed = segment.trim();
-        return (
-          trimmed.length > 0 &&
-          trimmed.length <= FOLDER_SEGMENT_MAX_LENGTH &&
-          trimmed === segment
-        );
-      }),
-    { message: t('zod.client.folder') }
+      v
+        .split('/')
+        .every(
+          (segment) =>
+            segment.length > 0 && segment.length <= FOLDER_SEGMENT_MAX_LENGTH
+        ),
+    { message: t('zod.client.folderInvalid') }
   )
   .nullable();
 

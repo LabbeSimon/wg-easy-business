@@ -9,8 +9,10 @@ services:
       - /lib/modules:/lib/modules:ro
       # - ./data/:/etc/wireguard
     ports:
-      - "51820:51820/udp"
-      - "51821:51821/tcp"
+      # shifted and bound to localhost so a production wg-easy can keep running
+      # on the same host during development
+      - "127.0.0.1:51830:51820/udp"
+      - "127.0.0.1:51831:51821/tcp"
     cap_add:
       - NET_ADMIN
       - SYS_MODULE

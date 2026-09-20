@@ -207,7 +207,8 @@
       "serverAllowedIps": "IPs autorisées par le serveur",
       "firewallIps": "IPs autorisées par le pare-feu",
       "firewallIpsInvalid": "Entrée d'IP de pare-feu invalide. Voir la documentation pour la syntaxe supportée.",
-      "folder": "Dossier"
+      "folder": "Dossier",
+      "folderInvalid": "Le chemin du dossier ne doit pas contenir de niveau vide, et chaque niveau fait 64 caractères au maximum."
     },
     "user": {
       "username": "Nom d'utilisateur",
