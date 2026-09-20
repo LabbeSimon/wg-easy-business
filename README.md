@@ -1,125 +1,176 @@
-# WireGuard Easy
+# wg-easy-business — Self-Hosted Business VPN Built on WireGuard
 
-[![Build & Publish latest Image](https://github.com/wg-easy/wg-easy/actions/workflows/deploy.yml/badge.svg)](https://github.com/wg-easy/wg-easy/actions/workflows/deploy.yml)
-[![Lint](https://github.com/wg-easy/wg-easy/actions/workflows/lint.yml/badge.svg?branch=master)](https://github.com/wg-easy/wg-easy/actions/workflows/lint.yml)
-[![GitHub Stars](https://img.shields.io/github/stars/wg-easy/wg-easy)](https://github.com/wg-easy/wg-easy/stargazers)
-[![License](https://img.shields.io/github/license/wg-easy/wg-easy)](LICENSE)
-[![GitHub Release](https://img.shields.io/github/v/release/wg-easy/wg-easy)](https://github.com/wg-easy/wg-easy/releases/latest)
-[![Image Pulls](https://img.shields.io/badge/image_pulls-28M+-blue)](https://github.com/wg-easy/wg-easy/pkgs/container/wg-easy)
+[![License](https://img.shields.io/github/license/LabbeSimon/wg-easy-business)](LICENSE)
+[![Based on wg-easy](https://img.shields.io/badge/fork_of-wg--easy-blue)](https://github.com/wg-easy/wg-easy)
+[![WireGuard](https://img.shields.io/badge/protocol-WireGuard-88171A)](https://www.wireguard.com/)
 
-You have found the easiest way to install & manage WireGuard on any Linux host!
+**An open source, self-hosted VPN server for companies and teams.** Give every employee
+their own encrypted WireGuard connection, one configuration per device, organised in
+folders you can switch off in a single click. Runs on any Linux host with Docker, on your
+own hardware, with no per-seat licence and no third party holding your traffic.
+
+This is a business-oriented fork of [wg-easy](https://github.com/wg-easy/wg-easy), the
+WireGuard web UI with 28M+ image pulls. It keeps everything that made the original simple
+and adds what a company needs to actually administer a fleet.
 
 <p align="center">
-  <img src="./assets/screenshot.png" width="802" alt="wg-easy Screenshot" />
+  <img src="./assets/screenshot.png" width="802" alt="wg-easy-business web interface listing VPN devices" />
 </p>
 
-## Features
+## Why WireGuard for a business VPN
 
-- All-in-one: WireGuard + Web UI.
-- Easy installation, simple to use.
-- List, create, edit, delete, enable & disable clients.
-- Show a client's QR code.
-- Download a client's configuration file.
-- Statistics for which clients are connected.
-- Tx/Rx charts for each connected client.
-- Gravatar support.
-- Automatic Light / Dark Mode
-- Multilanguage Support
-- One Time Links
-- Client Expiration
-- Prometheus metrics support
-- IPv6 support
-- CIDR support
-- 2FA support
-- Per-client firewall filtering (requires iptables)
-- OIDC support (Google, GitHub, Authelia, Authentik, etc.)
+WireGuard is a modern VPN protocol built into the Linux kernel. Compared with OpenVPN and
+IPsec it is roughly 4,000 lines of code instead of hundreds of thousands, which means a far
+smaller attack surface and a codebase that has actually been reviewed end to end. It uses
+fixed, current cryptography — ChaCha20, Poly1305, Curve25519, BLAKE2s — with no negotiation
+of weak legacy ciphers, connects in a single round trip, and roams between Wi-Fi and mobile
+data without dropping the tunnel.
 
-> [!NOTE]
-> To better manage documentation for this project, it has its own site here: [https://wg-easy.github.io/wg-easy/latest](https://wg-easy.github.io/wg-easy/latest)
+For a company that translates into: faster remote access, lower CPU cost on the server,
+and a protocol your auditors can read in an afternoon.
 
-- [Getting Started](https://wg-easy.github.io/wg-easy/latest/getting-started/)
-- [Basic Installation](https://wg-easy.github.io/wg-easy/latest/examples/tutorials/basic-installation/)
-- [Caddy](https://wg-easy.github.io/wg-easy/latest/examples/tutorials/caddy/)
-- [Traefik](https://wg-easy.github.io/wg-easy/latest/examples/tutorials/traefik/)
-- [Podman](https://wg-easy.github.io/wg-easy/latest/examples/tutorials/podman-nft/)
-- [AdGuard Home](https://wg-easy.github.io/wg-easy/latest/examples/tutorials/adguard/)
+## What this fork adds
 
-> [!NOTE]
-> If you want to migrate from the old version to the new version, you can find the migration guide here: [Migration Guide](https://wg-easy.github.io/wg-easy/latest/advanced/migrate/)
+| Capability | What it does |
+|---|---|
+| **Folders and subfolders** | Group devices into a tree such as `Acme Corp/Paris/Laptops`. Organise your whole fleet by customer, site, department or device type. |
+| **One-click bulk disable** | Switch off a folder and every device below it, nested subfolders included, drops out of the WireGuard configuration immediately. Switch it back on just as fast. |
+| **One VPN per device** | An employee with a laptop, a phone and a tablet gets three separate encrypted configurations, each revocable on its own without touching the others. |
+| **Employee onboarding in one screen** | Create the person and all of their devices in a single action, filed straight into the right folder. |
+| **One-click offboarding** | Disable a departing employee and every device they own at once, wherever those devices are filed. Their login stops working and their tunnels drop. |
+| **User administration** | Create, edit, disable and delete accounts from the web interface, with device counts per person and guards against locking yourself out. |
 
-## Installation
+Everything is driven from the web interface. There is no configuration file to hand-edit
+and no command line step for day-to-day administration.
 
-This is a quick start guide to get you up and running with WireGuard Easy.
+## Features inherited from wg-easy
 
-For a more detailed installation guide, please refer to the [Getting Started](https://wg-easy.github.io/wg-easy/latest/getting-started/) page.
+- All-in-one: WireGuard server plus web interface
+- List, create, edit, delete, enable and disable devices
+- QR code and downloadable configuration file for every device
+- One-time links for sending a configuration securely
+- Device expiration dates
+- Live statistics and Tx/Rx charts per connected device
+- Two-factor authentication (TOTP)
+- OIDC single sign-on (Google, GitHub, Authelia, Authentik and others)
+- Per-device firewall filtering
+- IPv6 and CIDR support
+- Prometheus metrics
+- Automatic light and dark mode, multi-language interface
+
+## Who this is for
+
+- **Companies running remote or hybrid teams** that want encrypted access to internal
+  services without paying per seat.
+- **Managed service providers** administering VPN access across several client
+  organisations, one folder per client.
+- **Agencies and consultancies** handing contractors time-limited access that can be
+  revoked the day the contract ends.
+- **Anyone replacing a commercial VPN** who would rather keep the server, the keys and the
+  logs in-house.
+
+## Self-hosted versus commercial VPN services
+
+| | wg-easy-business | Commercial business VPN |
+|---|---|---|
+| Cost | Your server, no per-user licence | Monthly fee per seat |
+| Data | Stays on your infrastructure | Passes through a third party |
+| Keys | Generated and stored by you | Held by the provider |
+| Audit | Source is open, AGPL-3.0 | Closed, vendor attestation |
+| Limits | Whatever your hardware handles | Plan tiers and quotas |
+
+## Quick start
 
 ### 1. Install Docker
 
-If you haven't installed Docker yet, install it by running as root:
-
 ```shell
 curl -sSL https://get.docker.com | sh
-exit
 ```
 
-And log in again.
+Log out and back in afterwards.
 
-### 2. Run WireGuard Easy
+### 2. Run the server
 
-The easiest way to run WireGuard Easy is with Docker Compose.
+Follow the [basic installation guide](https://wg-easy.github.io/wg-easy/latest/examples/tutorials/basic-installation/),
+substituting this fork's image for the upstream one. Installation, reverse proxy setup and
+host requirements are unchanged from wg-easy, so the upstream documentation applies:
 
-Just follow [these steps](https://wg-easy.github.io/wg-easy/latest/examples/tutorials/basic-installation/) in the detailed documentation.
+- [Getting started](https://wg-easy.github.io/wg-easy/latest/getting-started/)
+- [Behind Caddy](https://wg-easy.github.io/wg-easy/latest/examples/tutorials/caddy/)
+- [Behind Traefik](https://wg-easy.github.io/wg-easy/latest/examples/tutorials/traefik/)
+- [Podman](https://wg-easy.github.io/wg-easy/latest/examples/tutorials/podman-nft/)
+- [With AdGuard Home](https://wg-easy.github.io/wg-easy/latest/examples/tutorials/adguard/)
 
-You can also install WireGuard Easy with the [docker run command](https://wg-easy.github.io/wg-easy/latest/examples/tutorials/docker-run/) or via [podman](https://wg-easy.github.io/wg-easy/latest/examples/tutorials/podman-nft/).
+### 3. Enroll your first employee
 
-Now [setup a reverse proxy](https://wg-easy.github.io/wg-easy/latest/examples/tutorials/basic-installation/#setup-reverse-proxy) to be able to access the Web UI securely from the internet. This step is optional, just make sure to follow the guide [here](https://wg-easy.github.io/wg-easy/latest/examples/tutorials/reverse-proxyless/) if you decide not to do it.
+Open the web interface, go to **Admin → Onboarding**, enter the person's name and the
+devices they use, and pick the folder they belong in. Every device gets its own
+configuration, ready to send by QR code or one-time link.
 
-## Donate
+## Frequently asked questions
 
-Are you enjoying this project? Consider donating.
+**Is WireGuard secure enough for company traffic?**
+WireGuard is in the mainline Linux kernel and uses only modern, fixed cryptographic
+primitives. Its small codebase has been formally analysed, which is a large part of why it
+has replaced OpenVPN in so many deployments.
 
-Founder: [Buy Emile a beer!](https://github.com/sponsors/WeeJeWel) 🍻
+**How many devices can one server handle?**
+WireGuard itself is very light; the practical limit is your bandwidth and the host running
+it. A small VPS comfortably serves a team of dozens.
 
-Maintainer: [Buy kaaax0815 a coffee!](https://github.com/sponsors/kaaax0815) ☕
+**What happens when an employee leaves?**
+Disable them from the user list. Their account stops authenticating and all of their
+devices leave the WireGuard configuration in the same action, whichever folders they are
+filed in. Deleting the account removes their devices with it.
+
+**Can one person have several devices?**
+Yes, that is the point. Each device carries its own key pair and its own configuration, so
+a lost phone is revoked on its own without disturbing the laptop.
+
+**Does disabling a folder delete anything?**
+No. It only switches the devices off. Turning the folder back on restores them.
+
+**Can I use my existing single sign-on?**
+Yes. OIDC is inherited from wg-easy and works with Google, GitHub, Authelia, Authentik and
+other standard providers.
 
 ## Development
 
 ### Prerequisites
 
 - Docker
-- Node LTS & corepack enabled
-- Visual Studio Code
+- Node LTS with corepack enabled
 
-### Dev Server
-
-This starts the development server with docker
+### Dev server
 
 ```shell
 pnpm dev
 ```
 
-### Update Auto Imports
+The development compose file binds to `127.0.0.1:51830` and `127.0.0.1:51831` so it can run
+on a host that already serves a production wg-easy instance.
 
-If you add something that should be auto-importable and VSCode complains, run:
-
-```shell
-cd src
-pnpm install
-cd ..
-```
-
-### Test Cli
-
-This starts the cli with docker
+### Checks
 
 ```shell
-pnpm cli:dev
+cd src && pnpm typecheck && pnpm lint && pnpm test:unit
 ```
+
+## Credits
+
+This project is a fork of [wg-easy](https://github.com/wg-easy/wg-easy) by Emile Nijssen
+and its maintainers. All of the groundwork — the WireGuard integration, the web interface,
+the installation tooling — comes from them. If this fork is useful to you, consider
+supporting the original authors:
+
+- Founder: [Buy Emile a beer](https://github.com/sponsors/WeeJeWel)
+- Maintainer: [Buy kaaax0815 a coffee](https://github.com/sponsors/kaaax0815)
 
 ## License
 
-This project is licensed under the AGPL-3.0-only License - see the [LICENSE](LICENSE) file for details
+Licensed under the AGPL-3.0-only License, inherited from wg-easy — see [LICENSE](LICENSE).
 
-This project is not affiliated, associated, authorized, endorsed by, or in any way officially connected with Jason A. Donenfeld, ZX2C4 or Edge Security
+This project is not affiliated, associated, authorized, endorsed by, or in any way
+officially connected with Jason A. Donenfeld, ZX2C4 or Edge Security.
 
-"WireGuard" and the "WireGuard" logo are registered trademarks of Jason A. Donenfeld
+"WireGuard" and the "WireGuard" logo are registered trademarks of Jason A. Donenfeld.
