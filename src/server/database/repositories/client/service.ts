@@ -4,7 +4,7 @@ import { containsCidr, parseCidr } from 'cidr-tools';
 import { client } from './schema';
 import type {
   ClientCreateFromExistingType,
-  ClientCreateType,
+  ClientCreateInputType,
   ClientQueryType,
   UpdateClientType,
 } from './types';
@@ -72,6 +72,7 @@ export class ClientService {
       filters.push(
         or(
           like(client.name, filterPattern),
+          like(client.folder, filterPattern),
           like(client.ipv4Address, filterPattern),
           like(client.ipv6Address, filterPattern)
         )
@@ -117,6 +118,7 @@ export class ClientService {
       filters.push(
         or(
           like(client.name, filterPattern),
+          like(client.folder, filterPattern),
           like(client.ipv4Address, filterPattern),
           like(client.ipv6Address, filterPattern)
         )
@@ -153,7 +155,7 @@ export class ClientService {
     return this.#statements.findById.execute({ id });
   }
 
-  async create({ name, expiresAt }: ClientCreateType) {
+  async create({ name, expiresAt, folder, userId }: ClientCreateInputType) {
     const privateKey = await wg.generatePrivateKey();
     const publicKey = await wg.getPublicKey(privateKey);
     const preSharedKey = await wg.generatePreSharedKey();
@@ -189,8 +191,8 @@ export class ClientService {
         .insert(client)
         .values({
           name,
-          // TODO: properly assign user id
-          userId: 1,
+          userId,
+          folder,
           interfaceId: 'wg0',
           expiresAt,
           privateKey,
@@ -218,6 +220,14 @@ export class ClientService {
 
   toggle(id: ID, enabled: boolean) {
     return this.#statements.toggle.execute({ id, enabled });
+  }
+
+  setFolder(id: ID, folder: string | null) {
+    return this.#db
+      .update(client)
+      .set({ folder })
+      .where(eq(client.id, id))
+      .execute();
   }
 
   delete(id: ID) {

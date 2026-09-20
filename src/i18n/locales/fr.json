@@ -205,7 +205,8 @@
       "address6": "Adresse IPv6",
       "serverAllowedIps": "IPs autorisées par le serveur",
       "firewallIps": "IPs autorisées par le pare-feu",
-      "firewallIpsInvalid": "Entrée d'IP de pare-feu invalide. Voir la documentation pour la syntaxe supportée."
+      "firewallIpsInvalid": "Entrée d'IP de pare-feu invalide. Voir la documentation pour la syntaxe supportée.",
+      "folder": "Dossier"
     },
     "user": {
       "username": "Nom d'utilisateur",
@@ -243,7 +244,10 @@
     "address": "Adresse IP",
     "dns": "DNS",
     "allowedIps": "IPs autorisées",
-    "file": "Fichier"
+    "file": "Fichier",
+    "folder": {
+      "intoDescendant": "Un dossier ne peut pas être déplacé dans un de ses propres sous-dossiers"
+    }
   },
   "hooks": {
     "preUp": "PreUp",

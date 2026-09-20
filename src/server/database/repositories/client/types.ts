@@ -23,6 +23,7 @@ import {
   schemaForType,
   t,
 } from '#server/utils/types';
+import type { ID } from '#server/utils/types';
 
 export type ClientType = InferSelectModel<typeof client>;
 
@@ -102,6 +103,11 @@ export const ClientCreateSchema = z.object({
 });
 
 export type ClientCreateType = z.infer<typeof ClientCreateSchema>;
+
+/** the owner is resolved by the route, never taken from the request body as is */
+export type ClientCreateInputType = Omit<ClientCreateType, 'userId'> & {
+  userId: ID;
+};
 
 const filter = z.string().pipe(safeStringRefine);
 

@@ -69,6 +69,10 @@ export type Permissions = {
     dataType: Pick<ClientType, 'id' | 'userId'>;
     action: 'view' | 'create' | 'update' | 'delete' | 'custom';
   };
+  folders: {
+    dataType: never;
+    action: 'view' | 'manage';
+  };
   admin: {
     dataType: never;
     action: 'any';
@@ -88,6 +92,10 @@ export const ROLES = {
       delete: true,
       custom: true,
     },
+    folders: {
+      view: true,
+      manage: true,
+    },
     admin: {
       any: true,
     },
@@ -102,6 +110,10 @@ export const ROLES = {
       update: (user, client) => user.id === client.userId,
       delete: (user, client) => user.id === client.userId,
       custom: true,
+    },
+    folders: {
+      view: true,
+      manage: false,
     },
     admin: {
       any: false,

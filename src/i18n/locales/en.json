@@ -221,7 +221,8 @@
       "address6": "IPv6 Address",
       "serverAllowedIps": "Server Allowed IPs",
       "firewallIps": "Firewall Allowed IPs",
-      "firewallIpsInvalid": "Invalid firewall IP entry. See docs for supported syntax."
+      "firewallIpsInvalid": "Invalid firewall IP entry. See docs for supported syntax.",
+      "folder": "Folder"
     },
     "user": {
       "username": "Username",
@@ -262,7 +263,10 @@
     "address": "IP Address",
     "dns": "DNS",
     "allowedIps": "Allowed IPs",
-    "file": "File"
+    "file": "File",
+    "folder": {
+      "intoDescendant": "A folder cannot be moved into one of its own subfolders"
+    }
   },
   "hooks": {
     "preUp": "PreUp",

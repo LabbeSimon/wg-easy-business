@@ -11,6 +11,7 @@ import { InterfaceService } from '#db/repositories/interface/service';
 import { HooksService } from '#db/repositories/hooks/service';
 import { OneTimeLinkService } from '#db/repositories/oneTimeLink/service';
 import { ClientService } from '#db/repositories/client/service';
+import { FolderService } from '#db/repositories/folder/service';
 import * as schema from '#db/schema';
 import { WG_ENV, WG_INITIAL_ENV } from '#server/utils/config';
 
@@ -37,6 +38,7 @@ export async function connect() {
 
 class DBService {
   clients: ClientService;
+  folders: FolderService;
   general: GeneralService;
   users: UserService;
   userConfigs: UserConfigService;
@@ -46,6 +48,7 @@ class DBService {
 
   constructor(db: DBType) {
     this.clients = new ClientService(db);
+    this.folders = new FolderService(db);
     this.general = new GeneralService(db);
     this.users = new UserService(db);
     this.userConfigs = new UserConfigService(db);
