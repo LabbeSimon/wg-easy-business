@@ -44,6 +44,31 @@ const name = z
   .pipe(safeStringRefine)
   .pipe(controlStringRefine);
 
+export const FOLDER_SEGMENT_MAX_LENGTH = 64;
+export const FOLDER_PATH_MAX_LENGTH = 512;
+/** deeper folders still work, the UI only warns about them */
+export const FOLDER_DEPTH_WARNING = 5;
+
+/** slash separated path, null means root */
+export const FolderPathSchema = z
+  .string({ message: t('zod.client.folder') })
+  .max(FOLDER_PATH_MAX_LENGTH, { message: t('zod.client.folder') })
+  .pipe(safeStringRefine)
+  .pipe(controlStringRefine)
+  .refine(
+    (v) =>
+      v.split('/').every((segment) => {
+        const trimmed = segment.trim();
+        return (
+          trimmed.length > 0 &&
+          trimmed.length <= FOLDER_SEGMENT_MAX_LENGTH &&
+          trimmed === segment
+        );
+      }),
+    { message: t('zod.client.folder') }
+  )
+  .nullable();
+
 // TODO?: validate iso string
 const expiresAt = z
   .string({ message: t('zod.client.expiresAt') })
@@ -72,6 +97,8 @@ const serverAllowedIps = z.array(AddressSchema, {
 export const ClientCreateSchema = z.object({
   name: name,
   expiresAt: expiresAt,
+  folder: FolderPathSchema.default(null),
+  userId: z.number().optional(),
 });
 
 export type ClientCreateType = z.infer<typeof ClientCreateSchema>;
@@ -90,6 +117,7 @@ export type ClientQueryType = z.infer<typeof ClientQuerySchema>;
 export const ClientUpdateSchema = schemaForType<UpdateClientType>()(
   z.object({
     name: name,
+    folder: FolderPathSchema,
     enabled: EnabledSchema,
     expiresAt: expiresAt,
     ipv4Address: address4,

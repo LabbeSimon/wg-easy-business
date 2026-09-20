@@ -1,0 +1,1 @@
+ALTER TABLE `clients_table` ADD `folder` text;
