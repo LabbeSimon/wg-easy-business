@@ -132,7 +132,8 @@
     "firewallIps": "Firewall Allowed IPs",
     "firewallIpsDesc": "Destination IPs/CIDRs this client can access (server-side enforcement). Leave empty to use Allowed IPs. Supports optional port and protocol filtering. See docs for syntax.",
     "downloadPng": "Download PNG",
-    "copyPng": "Copy PNG"
+    "copyPng": "Copy PNG",
+    "owner": "Owner"
   },
   "dialog": {
     "change": "Change",
@@ -334,5 +335,17 @@
     "disableCookiesDescription": "Do not answer handshakes with cookie messages when under load. Only affects this side of the tunnel",
     "mtuNote": "Values depend on the MTU",
     "obfuscationParameters": "AmneziaWG Obfuscation Parameters"
+  },
+  "folder": {
+    "path": "Folder",
+    "pathDesc": "Slash separated path, for example Client A/Paris. Leave empty to keep the device unfiled.",
+    "unfiled": "Unfiled",
+    "rename": "Rename folder",
+    "renamed": "Folder renamed",
+    "enableAll": "Enable the whole folder",
+    "disableAll": "Disable the whole folder",
+    "expand": "Expand",
+    "collapse": "Collapse",
+    "tooDeep": "Nested more than {depth} levels deep"
   }
 }

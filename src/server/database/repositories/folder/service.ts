@@ -1,22 +1,20 @@
-import { and, eq, inArray, isNotNull } from 'drizzle-orm';
+import { inArray, isNotNull } from 'drizzle-orm';
 
 import { client } from '../client/schema';
 import { FOLDER_PATH_MAX_LENGTH } from '../client/types';
 
-import type { FolderNode } from './types';
-
 import type { DBType } from '#db/sqlite';
 import type { ID } from '#server/utils/types';
-
-/** a folder path belongs to a branch when it is the branch itself or sits below it */
-function inBranch(folder: string, branch: string) {
-  return folder === branch || folder.startsWith(`${branch}/`);
-}
+import { inBranch } from '#shared/utils/folders';
 
 function isExpired(expiresAt: string | null) {
   return expiresAt !== null && new Date() > new Date(expiresAt);
 }
 
+/**
+ * Folders have no table of their own, they are a path carried by each client.
+ * This service only holds the bulk operations that act on a whole branch.
+ */
 export class FolderService {
   #db: DBType;
 
@@ -24,7 +22,7 @@ export class FolderService {
     this.#db = db;
   }
 
-  #foldered(userId?: ID) {
+  #foldered() {
     return this.#db
       .select({
         id: client.id,
@@ -33,11 +31,7 @@ export class FolderService {
         expiresAt: client.expiresAt,
       })
       .from(client)
-      .where(
-        userId === undefined
-          ? isNotNull(client.folder)
-          : and(isNotNull(client.folder), eq(client.userId, userId))
-      )
+      .where(isNotNull(client.folder))
       .execute() as Promise<
       {
         id: ID;
@@ -46,62 +40,6 @@ export class FolderService {
         expiresAt: string | null;
       }[]
     >;
-  }
-
-  /**
-   * Folders are not stored, they are derived from the paths clients carry.
-   * A folder therefore stops existing as soon as its last client leaves it.
-   */
-  async getTree(userId?: ID) {
-    const rows = await this.#foldered(userId);
-    const nodes = new Map<string, FolderNode>();
-
-    const ensure = (path: string): FolderNode => {
-      const existing = nodes.get(path);
-      if (existing) {
-        return existing;
-      }
-
-      const segments = path.split('/');
-      const node: FolderNode = {
-        name: segments[segments.length - 1]!,
-        path,
-        depth: segments.length,
-        clientCount: 0,
-        totalClientCount: 0,
-        enabledClientCount: 0,
-        children: [],
-      };
-      nodes.set(path, node);
-
-      if (segments.length > 1) {
-        ensure(segments.slice(0, -1).join('/')).children.push(node);
-      }
-
-      return node;
-    };
-
-    for (const row of rows) {
-      ensure(row.folder).clientCount++;
-
-      const segments = row.folder.split('/');
-      for (let i = 1; i <= segments.length; i++) {
-        const ancestor = nodes.get(segments.slice(0, i).join('/'))!;
-        ancestor.totalClientCount++;
-        if (row.enabled) {
-          ancestor.enabledClientCount++;
-        }
-      }
-    }
-
-    const sortTree = (list: FolderNode[]): FolderNode[] =>
-      list
-        .sort((a, b) => a.name.localeCompare(b.name))
-        .map((node) => ({ ...node, children: sortTree(node.children) }));
-
-    return sortTree(
-      Array.from(nodes.values()).filter((node) => node.depth === 1)
-    );
   }
 
   /**

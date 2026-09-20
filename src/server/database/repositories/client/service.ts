@@ -83,6 +83,7 @@ export class ClientService {
       .findMany({
         with: {
           oneTimeLink: true,
+          user: { columns: { id: true, name: true, username: true } },
         },
         where: and(...filters),
         columns: {
@@ -128,7 +129,10 @@ export class ClientService {
     const result = await this.#db.query.client
       .findMany({
         where: and(eq(client.userId, userId), ...filters),
-        with: { oneTimeLink: true },
+        with: {
+          oneTimeLink: true,
+          user: { columns: { id: true, name: true, username: true } },
+        },
         columns: {
           privateKey: false,
           preSharedKey: false,

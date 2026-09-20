@@ -47,8 +47,6 @@ const name = z
 
 export const FOLDER_SEGMENT_MAX_LENGTH = 64;
 export const FOLDER_PATH_MAX_LENGTH = 512;
-/** deeper folders still work, the UI only warns about them */
-export const FOLDER_DEPTH_WARNING = 5;
 
 /** slash separated path, null means root */
 export const FolderPathSchema = z

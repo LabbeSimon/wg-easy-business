@@ -71,7 +71,7 @@ export type Permissions = {
   };
   folders: {
     dataType: never;
-    action: 'view' | 'manage';
+    action: 'manage';
   };
   admin: {
     dataType: never;
@@ -93,7 +93,6 @@ export const ROLES = {
       custom: true,
     },
     folders: {
-      view: true,
       manage: true,
     },
     admin: {
@@ -112,7 +111,6 @@ export const ROLES = {
       custom: true,
     },
     folders: {
-      view: true,
       manage: false,
     },
     admin: {

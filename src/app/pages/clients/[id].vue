@@ -17,6 +17,13 @@
               v-model="data.name"
               :label="$t('general.name')"
             />
+            <FormNullTextField
+              id="folder"
+              v-model="data.folder"
+              :label="$t('folder.path')"
+              :description="$t('folder.pathDesc')"
+              placeholder="Client A/Site Paris"
+            />
             <FormSwitchField
               id="enabled"
               v-model="data.enabled"

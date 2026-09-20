@@ -123,7 +123,8 @@
     "firewallIps": "IPs autorisées par le pare-feu",
     "firewallIpsDesc": "IPs/CIDRs de destination auxquels ce client peut accéder (application côté serveur). Laissez vide pour utiliser les IPs autorisées. Prend en charge le filtrage optionnel par port et protocole. Voir la documentation pour la syntaxe.",
     "downloadPng": "Télécharger le PNG",
-    "copyPng": "Copier le PNG"
+    "copyPng": "Copier le PNG",
+    "owner": "Propriétaire"
   },
   "dialog": {
     "change": "Modifier",
@@ -296,5 +297,17 @@
     "i5Description": "Paquet de simulation de protocole en format hexadécimal : <b 0x...>",
     "mtuNote": "Les valeurs dépendent du MTU",
     "obfuscationParameters": "Paramètres d'obfuscation AmneziaWG"
+  },
+  "folder": {
+    "path": "Dossier",
+    "pathDesc": "Chemin séparé par des barres obliques, par exemple Client A/Paris. Laisser vide pour ne pas classer l'appareil.",
+    "unfiled": "Non classés",
+    "rename": "Renommer le dossier",
+    "renamed": "Dossier renommé",
+    "enableAll": "Activer tout le dossier",
+    "disableAll": "Désactiver tout le dossier",
+    "expand": "Déplier",
+    "collapse": "Replier",
+    "tooDeep": "Imbriqué à plus de {depth} niveaux"
   }
 }

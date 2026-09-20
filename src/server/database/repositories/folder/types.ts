@@ -3,21 +3,6 @@ import z from 'zod';
 import { FolderPathSchema } from '#db/repositories/client/types';
 import { EnabledSchema, t } from '#server/utils/types';
 
-export type FolderNode = {
-  /** last segment of the path */
-  name: string;
-  /** full slash separated path */
-  path: string;
-  depth: number;
-  /** clients sitting directly in this folder */
-  clientCount: number;
-  /** clients in this folder and every descendant */
-  totalClientCount: number;
-  /** enabled clients in this folder and every descendant */
-  enabledClientCount: number;
-  children: FolderNode[];
-};
-
 /** a folder only exists through its clients, so the path is never null here */
 const path = FolderPathSchema.unwrap();
 
